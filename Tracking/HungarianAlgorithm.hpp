@@ -5,10 +5,14 @@
 #ifndef BEEMULTITARGETTRACKING_HUNGARIANALGORITHM_HPP
 #define BEEMULTITARGETTRACKING_HUNGARIANALGORITHM_HPP
 
-#include "Definitions.hpp"
+#include "../Definitions.hpp"
 
 #include <vector>
 
+/**
+ * Implementation based on:
+ * https://www.topcoder.com/community/competitive-programming/tutorials/assignment-problem-and-hungarian-algorithm/
+ */
 class HungarianAlgorithm
 {
  public:
@@ -34,7 +38,8 @@ class HungarianAlgorithm
   int max_match_;
 
   void InitializeLabels();
-  void Augment();
+  void AugmentRecursively();
+  void AugmentSequentially();
   void UpdateLabels();
   void AddToTree(int x, int prev_x);
 

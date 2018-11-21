@@ -23,7 +23,9 @@ class ImageProcessingEngine
   explicit ImageProcessingEngine(ParameterHandler &parameter_handler);
   ~ImageProcessingEngine();
 
-  void RetrieveBacterialData(int image, std::vector<Eigen::VectorXf> &detections);
+  void CreateImageProcessingOutputFile();
+  void CloseImageProcessingOutputFile();
+  void RetrieveBacterialData(int image, std::vector<Eigen::VectorXd> &detections);
 
   const cv::Mat &GetSourceImage();
   const cv::Mat &GetSourceImage(int image);
@@ -58,7 +60,7 @@ class ImageProcessingEngine
   void DrawContours();
 
   void SaveImage(const cv::Mat &I, int image);
-  void SaveDetectedObjects(int image, std::vector<Eigen::VectorXf> &detections);
+  void SaveDetectedObjects(int image, std::vector<Eigen::VectorXd> &detections);
 
 };
 

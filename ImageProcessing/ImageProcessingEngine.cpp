@@ -17,20 +17,31 @@ ImageProcessingEngine::ImageProcessingEngine(ParameterHandler &parameter_handler
   threshold_image_ = cv::Mat::zeros(0, 0, CV_8UC1);
   edge_image_ = cv::Mat::zeros(0, 0, CV_8UC1);
   contour_image_ = cv::Mat::zeros(0, 0, CV_8UC3);
-
-  std::string image_processing_output_file_name =
-      parameter_handler_.GetInputFolder() + parameter_handler.GetDataAnalysisSubfolder()
-          + parameter_handler.GetImageProcessingOutputFileName();
-  image_processing_output_file_.open(image_processing_output_file_name, std::ios::out | std::ios::trunc);
-  assert(image_processing_output_file_.is_open());
 }
 
 ImageProcessingEngine::~ImageProcessingEngine()
 {
-  image_processing_output_file_.close();
+  CloseImageProcessingOutputFile();
 }
 
-void ImageProcessingEngine::RetrieveBacterialData(int image, std::vector<Eigen::VectorXf> &detections)
+void ImageProcessingEngine::CreateImageProcessingOutputFile()
+{
+  std::string image_processing_output_file_name =
+      parameter_handler_.GetInputFolder() + parameter_handler_.GetDataAnalysisSubfolder()
+          + parameter_handler_.GetImageProcessingOutputFileName();
+  image_processing_output_file_.open(image_processing_output_file_name, std::ios::out | std::ios::trunc);
+  assert(image_processing_output_file_.is_open());
+}
+
+void ImageProcessingEngine::CloseImageProcessingOutputFile()
+{
+  if (image_processing_output_file_.is_open())
+  {
+    image_processing_output_file_.close();
+  }
+}
+
+void ImageProcessingEngine::RetrieveBacterialData(int image, std::vector<Eigen::VectorXd> &detections)
 {
   RetrieveSourceImage(image);
   SaturateImage(bgr_image_, saturated_image_);
@@ -57,8 +68,8 @@ void ImageProcessingEngine::RetrieveSourceImage(int image)
 
   std::cout << image_name << std::endl;
 
-  bgr_image_ = cv::imread(image_name, CV_LOAD_IMAGE_COLOR);
-  assert(bgr_image_.data != NULL);
+  bgr_image_ = cv::imread(image_name, cv::IMREAD_COLOR);
+  assert(bgr_image_.data != nullptr);
   bgr_image_ = cv::Mat(bgr_image_,
                        cv::Rect(parameter_handler_.GetSubimageXPos(),
                                 parameter_handler_.GetSubimageYPos(),
@@ -155,7 +166,9 @@ void ImageProcessingEngine::ApplyThreshold(const cv::Mat &I, cv::Mat &O)
 //              cv::Scalar(hue_lower, saturation_lower, value_lower, 0),
 //              cv::Scalar(hue_upper, saturation_upper, parameter_handler_.GetThresholdValue(), 0), threshold_image_);
 
-  cv::threshold(I, O, parameter_handler_.GetThresholdValue(), 255, 1);
+  const int max_binary_threshold_value = 255;
+  const int threshold_type = 1;
+  cv::threshold(I, O, parameter_handler_.GetThresholdValue(), max_binary_threshold_value, threshold_type);
 }
 
 void ImageProcessingEngine::DetectEdges(const cv::Mat &I, cv::Mat &O)
@@ -187,7 +200,6 @@ void ImageProcessingEngine::FindContours(const cv::Mat &I)
                    cv::RETR_EXTERNAL,
                    cv::CHAIN_APPROX_SIMPLE,
                    cv::Point(-offset, -offset));
-
   contours_.erase(std::remove_if(contours_.begin(),
                                  contours_.end(),
                                  [&](const std::vector<cv::Point> &contour)
@@ -245,7 +257,7 @@ void ImageProcessingEngine::SaveImage(const cv::Mat &I, int image)
 
 // according to the format
 // i -> x_i y_i v_x_i v_y_i width length
-void ImageProcessingEngine::SaveDetectedObjects(int image, std::vector<Eigen::VectorXf> &detections)
+void ImageProcessingEngine::SaveDetectedObjects(int image, std::vector<Eigen::VectorXd> &detections)
 {
   detections.clear();
 
@@ -253,7 +265,7 @@ void ImageProcessingEngine::SaveDetectedObjects(int image, std::vector<Eigen::Ve
 
   cv::Vec4f fitted_line;
   cv::RotatedRect min_rect;
-  Eigen::VectorXf new_detection(kNumOfExtractedFeatures);
+  Eigen::VectorXd new_detection(kNumOfExtractedFeatures);
   cv::Moments mu;
 
   for (int b = 0; b < (int) contours_.size(); ++b)
@@ -279,6 +291,12 @@ void ImageProcessingEngine::SaveDetectedObjects(int image, std::vector<Eigen::Ve
 
 const cv::Mat &ImageProcessingEngine::GetSourceImage()
 {
+  return bgr_image_;
+}
+
+const cv::Mat& ImageProcessingEngine::GetSourceImage(int image)
+{
+  RetrieveSourceImage(image);
   return bgr_image_;
 }
 

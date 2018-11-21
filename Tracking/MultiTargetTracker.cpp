@@ -9,7 +9,6 @@
 #include <iostream>
 
 MultiTargetTracker::MultiTargetTracker():
-    parameter_handler_(),
     targets_(),
     detections_()
 {
@@ -21,17 +20,20 @@ MultiTargetTracker::~MultiTargetTracker()
   std::cout << "multi-target tracking ended" << std::endl;
 }
 
-void MultiTargetTracker::Start()
+void MultiTargetTracker::PerformTrackingForOneExperiment(const std::string &configuration_file_name)
 {
-  ImageProcessingEngine image_processing_engine(parameter_handler_);
-  KalmanFilter kalman_filter(parameter_handler_, image_processing_engine);
+  ParameterHandler parameter_handler(configuration_file_name);
+  ImageProcessingEngine image_processing_engine(parameter_handler);
+  image_processing_engine.CreateImageProcessingOutputFile();
+  KalmanFilter kalman_filter(parameter_handler, image_processing_engine);
+  kalman_filter.CreateKalmanFilterOutputFiles();
 
-  image_processing_engine.RetrieveBacterialData(parameter_handler_.GetFirstImage(), detections_);
+  image_processing_engine.RetrieveBacterialData(parameter_handler.GetFirstImage(), detections_);
   kalman_filter.InitializeTargets(targets_, detections_);
 
-  for (int i = parameter_handler_.GetFirstImage() + 1; i <= parameter_handler_.GetLastImage(); ++i)
+  for (int i = parameter_handler.GetFirstImage() + 1; i <= parameter_handler.GetLastImage(); ++i)
   {
     image_processing_engine.RetrieveBacterialData(i, detections_);
     kalman_filter.PerformEstimation(i, targets_, detections_);
-  }
+  } // i
 }

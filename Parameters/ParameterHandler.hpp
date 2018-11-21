@@ -13,7 +13,7 @@ class ParameterHandler
 {
  public:
 
-  ParameterHandler();
+  explicit ParameterHandler(const std::string &file_name);
   ~ParameterHandler();
 
   const std::string &GetInputFolder();

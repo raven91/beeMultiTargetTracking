@@ -7,9 +7,10 @@
 #include <fstream>
 #include <map>
 
-ParameterHandler::ParameterHandler()
+ParameterHandler::ParameterHandler(const std::string &file_name)
 {
-  std::ifstream parameters_file("/Users/nikita/CLionProjects/beeMultiTargetTracking/Config.cfg", std::ios::in);
+//  std::ifstream parameters_file("/Users/nikita/CLionProjects/beeMultiTargetTracking/Config.cfg", std::ios::in);
+  std::ifstream parameters_file(file_name, std::ios::in);
   assert(parameters_file.is_open());
 
   // read string values
@@ -50,10 +51,7 @@ ParameterHandler::ParameterHandler()
   data_association_cost_ = parameters_dictionary["data_association_cost"];
 }
 
-ParameterHandler::~ParameterHandler()
-{
-
-}
+ParameterHandler::~ParameterHandler() = default;
 
 const std::string &ParameterHandler::GetInputFolder()
 {
