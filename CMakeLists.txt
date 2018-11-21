@@ -8,10 +8,10 @@ add_executable(beeMultiTargetTracking main.cpp Parameters/ParameterHandler.cpp P
 include_directories(/usr/local/include/opencv4/)
 link_directories(/usr/local/lib/)
 
-file(GLOB LIBRARIES "/usr/local/lib/libopencv_core.3.1.0.dylib"
-        "/usr/local/lib/libopencv_highgui.3.1.0.dylib"
-        "/usr/local/lib/libopencv_imgcodecs.3.1.0.dylib"
-        "/usr/local/lib/libopencv_imgproc.3.1.0.dylib")
+file(GLOB LIBRARIES "/usr/local/lib/libopencv_core.4.0.0.dylib"
+        "/usr/local/lib/libopencv_highgui.4.0.0.dylib"
+        "/usr/local/lib/libopencv_imgcodecs.4.0.0.dylib"
+        "/usr/local/lib/libopencv_imgproc.4.0.0.dylib")
 message("LIBRARIES = ${LIBRARIES}")
 
 target_link_libraries(beeMultiTargetTracking ${LIBRARIES})
